@@ -47,7 +47,7 @@ df2018 = df.where(df['game_id'] > 2018000000)
 df2018 = df2018.where(df2018['down'] == 4)
 
 df2018 = df2018.dropna(how='all')
-print(df2018.head()['down'])
+#print(df2018.head()['down'])
 
 
 def_down = pd.read_csv('C:\\Users\\Noah\\Desktop\\DataMining\\defense_downs_2017.csv')
@@ -71,18 +71,74 @@ defense = defense.replace({"Team" : teams})
 df2018 = df2018.merge(offense, how='left', left_on='posteam', right_on='Team')
 df2018 = df2018.merge(defense, how='left', left_on='defteam', right_on='Team')
 
-def decision(row):
-    if row['play_type'] == 'run' or row['play_type'] == 'pass':
-        return 1
-    else:
-        return 0
+def decision(dataframe):
+    list = []
 
-df2018 = df2018.apply(lambda row: decision(row), axis=1)
+    for row in dataframe['play_type']:
+        if row == 'run' or row == 'pass':
+            list.append(1)
+        else:
+            list.append(0)
+    
+    dataframe['decision'] = list
+    
+    return dataframe
 
-X = df2018.drop(['decision'], axis=1)
-y = df2018['decision']
+df2018 = decision(df2018)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+# remove strings from kick stats for each team on the year
+df2018['Lng_y_y'] = df2018['Lng_y_y'].str.replace('T','').astype(float)
+df2018['Lng_x_y'] = df2018['Lng_x_y'].str.replace('T','').astype(float)
+df2018['Lng_y_x'] = df2018['Lng_y_x'].str.replace('T','').astype(float)
+df2018['Lng'] = df2018['Lng'].str.replace('T','').astype(float)
 
-print(offense.head())
-print(defense.head())
+# filter out data that has null/nan columns
+df2018 = df[df['posteam'].notna()]
+
+def changeToPercentage(dataframe):
+    
+    columns = ['20-29 > A-M', '30-39 > A-M','40-49 > A-M', '50+ > A-M']
+    
+
+    #print(dataframe.loc[:,columns])
+    '''
+    for column in columns:
+        list = []
+
+        for row in dataframe[column]:
+            try:
+                denom,num = str(row).split('_')
+                #print(denom,num)
+                total = float(num)/float(denom)
+
+                list.append(total)
+            except ValueError:
+                print()    
+            
+        return dataframe
+    '''
+
+
+
+#df2018 = changeToPercentage(df2018)
+
+print(df2018['posteam'].value_counts())
+print(df2018['defteam'].value_counts())
+
+#print(df2018.head()[['decision','play_type']])
+#print(df2018.head())
+
+# test = df2018.select_dtypes(include=['O']).keys
+
+# print(test)
+
+
+
+
+
+#X = df2018.drop(['decision'], axis=1)
+#y = df2018['decision']
+
+
+
+#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
