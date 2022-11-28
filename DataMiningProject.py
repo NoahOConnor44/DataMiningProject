@@ -2,6 +2,15 @@ import pandas as pd
 import numpy as np
 import sklearn
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import f1_score
+from sklearn.feature_selection import SelectFromModel, SelectKBest
+from sklearn.feature_selection import f_classif
+from sklearn.feature_selection import RFE
+from sklearn.feature_selection import RFECV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
 
 selectedFeatures = ['game_id', 'posteam','qtr','posteam_type','defteam', 'down', 'quarter_seconds_remaining','yardline_100','drive','ydstogo','ydsnet','play_type','posteam_timeouts_remaining','defteam_timeouts_remaining','posteam_score','defteam_score','no_score_prob','fg_prob','td_prob', 'epa', 'wp']
 
@@ -93,52 +102,81 @@ df2018['Lng_y_x'] = df2018['Lng_y_x'].str.replace('T','').astype(float)
 df2018['Lng'] = df2018['Lng'].str.replace('T','').astype(float)
 
 # filter out data that has null/nan columns
-df2018 = df[df['posteam'].notna()]
+df2018 = df2018[df2018['posteam'].notna()]
 
-def changeToPercentage(dataframe):
-    
-    columns = ['20-29 > A-M', '30-39 > A-M','40-49 > A-M', '50+ > A-M']
-    
+# creates new seperate columns for kicks attempted vs kicks made
+df2018[['20-29 A','20-29 M']] = df2018['20-29 > A-M'].str.split('_', expand=True).astype('int')
+df2018[['30-39 A','30-39 M']] = df2018['30-39 > A-M'].str.split('_', expand=True).astype('int')
+df2018[['40-49 A','40-49 M']] = df2018['40-49 > A-M'].str.split('_', expand=True).astype('int')
+df2018[['50+ A','50+ M']] = df2018['50+ > A-M'].str.split('_', expand=True).astype('int')
 
-    #print(dataframe.loc[:,columns])
-    '''
-    for column in columns:
-        list = []
+df2018 = df2018.drop(['1-19 > A-M', '20-29 > A-M', '30-39 > A-M', '40-49 > A-M', '50+ > A-M'], axis=1)
+df2018 = df2018.drop(['posteam', 'defteam','posteam_type', 'play_type', 'Team_x', 'Team_y'], axis=1)
 
-        for row in dataframe[column]:
-            try:
-                denom,num = str(row).split('_')
-                #print(denom,num)
-                total = float(num)/float(denom)
+# remove rows with na values
+df2018 = df2018.dropna()
 
-                list.append(total)
-            except ValueError:
-                print()    
-            
-        return dataframe
-    '''
-
-
+# print(df2018.columns)
+# for col in df2018.columns:
+#     print(col)
+# print(df2018['20-29 > A-M'])
 
 #df2018 = changeToPercentage(df2018)
-
-print(df2018['posteam'].value_counts())
-print(df2018['defteam'].value_counts())
 
 #print(df2018.head()[['decision','play_type']])
 #print(df2018.head())
 
-# test = df2018.select_dtypes(include=['O']).keys
+#test = df2018.select_dtypes(include=['O']).keys
 
-# print(test)
+X = df2018.drop(['decision'], axis=1)
+y = df2018['decision']
+
+# for col in df2018.columns:
+#     print(df2018[col])
+
+#X.to_numpy() to convert to numpy array
+# select 50 best features from dataset
+# print(X.shape)
+#X_new = SelectKBest(f_classif, k=50).fit_transform(X.to_numpy(),y.to_numpy())
+#np.seterr(divide='ignore', invalid='ignore')
+# np.std(X, axis=0) == 0
+
+# split data 70% into training, 30% into testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+#model = LogisticRegression()
+# model = RandomForestClassifier()
+sum = 0
+for i in range(10):
+    model = RandomForestClassifier(max_depth=12, max_features=25, min_samples_leaf=1, n_estimators=150)
+    model.fit(X_train, y_train)
+
+    #rfe = RFE(estimator = model, n_features_to_select = 15)
+    #fit = rfe.fit(X_train, y_train)
+
+    #results = model.predict(X_test)
+
+    results = model.predict(X_test)
+
+    # potential imbalance, calculate f1 score
+    f1 = f1_score(y_test, results)
+    sum += f1
+
+print(sum/10)
+
+# param_grid = {
+#     'max_depth': [12, 15, 20, 25],
+#     'max_features': [12, 15, 25],
+#     'min_samples_leaf': [1, 3, 5],
+#     'n_estimators': [75, 100, 150]
+# }
+
+# rf = RandomForestClassifier()
+# grid_search = GridSearchCV(estimator = rf, param_grid = param_grid, cv=3)
+# grid_search.fit(X_train, y_train)
+# print(grid_search.best_params_)
 
 
-
-
-
-#X = df2018.drop(['decision'], axis=1)
-#y = df2018['decision']
-
-
-
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+#model.fit(X_train, y_train)
+#results = model.predict(X_test)
+#print(f1_score(y_test, results))
