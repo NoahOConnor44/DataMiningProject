@@ -49,7 +49,7 @@ def adjust_data_issues(df2018):
     kicking_columns = ['Lng_y_y','Lng_x_y','Lng_y_x','Lng']
     new_kicking_columns = [['20-29 A','20-29 M'],['30-39 A','30-39 M'],['40-49 A','40-49 M'],['50+ A','50+ M']]
     old_kicking_columns = ['20-29 > A-M','30-39 > A-M','40-49 > A-M','50+ > A-M']
-    drop_columns = ['posteam', 'defteam','posteam_type', 'play_type', 'Team_x', 'Team_y'] + old_kicking_columns
+    drop_columns = ['1-19 > A-M', 'posteam', 'defteam','posteam_type', 'play_type', 'Team_x', 'Team_y'] + old_kicking_columns
     
     df2018 = decision(df2018)
     
@@ -80,7 +80,3 @@ def adjust_main_df():
     df2018 = filter_df(df)
     df2018 = merge_all_df(df2018,off_down,spec_teams,off_rush, off_pass,def_down,def_pass,def_rush)
     return adjust_data_issues(df2018)
-
-# df = adjust_main_df()
-# print(df)
-
