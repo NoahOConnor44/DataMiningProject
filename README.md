@@ -3,8 +3,13 @@ CAP5771 Data Mining Project
 
 Run time is around 3-5 minutes
 
+Required packages: json, pandas, sklearn.tree, sklearn.metrics, sklearn.ensemble,
+   sklearn.model_selection, sklearn.neighbors, sklearn.svm, imblearn.over_sampling,
+   seaborn, matplotlib.pyplot
+
 Run Program with:
 python.exe DataMiningProject.py or python DataMiningProject.py
+
 
 
 F1 Score results are written to a result.txt file.
