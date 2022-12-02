@@ -18,18 +18,18 @@ F1 Score results are written to a result.txt file.
 
 pipenv to install dependencies
 ------------------------------
-pip install pipenv  ** You may need to add pipenv to your environmental path ** 
-pipenv install
-pipenv shell
-python DataMiningProject.py
+- pip install pipenv  ** You may need to add pipenv to your environmental path ** 
+- pipenv install
+- pipenv shell
+- python DataMiningProject.py
 
 
 Individual pip package install instructions if not using pipenv:
 --------------------------------------------
-json is part of the default python module since python 2.5
-pandas: pip install pandas
-numpy: pip intall numpy
-sklearn: pip install scikit-learn
-imblearn: pip install imblearn
-seaborn: pip install seaborn
-matplotlib: pip install matplotlib
+- json is part of the default python module since python 2.5
+- pandas: pip install pandas
+- numpy: pip intall numpy
+- sklearn: pip install scikit-learn
+- imblearn: pip install imblearn
+- seaborn: pip install seaborn
+- matplotlib: pip install matplotlib
